@@ -1,23 +1,25 @@
 pipeline {
-  agent none
+  agent any
+
+  environment {
+    // FOO will be available in entire pipeline
+    FOO = "PIPELINE"
+  }
 
   stages {
-    stage("Hello") {
+    stage("local") {
+      environment {
+        // BAR will only be available in this stage
+        BAR = "STAGE"
+      }
       steps {
-        echo "hello"
-        // need to use script block to assign value
-        script {
-          currentBuild.result = "UNSTABLE"
-        }
+        sh 'echo "FOO is $FOO and BAR is $BAR"'
       }
     }
-  }
-  post {
-    always {
-      echo "I ALWAYS run first"
-    }
-    unstable {
-      echo "UNSTABLE runs after ALWAYS"
+    stage("global") {
+      steps {
+        sh 'echo "FOO is $FOO and BAR is $BAR"'
+      }
     }
   }
 }
